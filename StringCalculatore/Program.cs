@@ -7,7 +7,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        string input = "2*9*10/18+5*10/10";
+        string input = "2*9*10/18+5*10/10*2+15/3*2";
 
         // Digits and Operators
         Regex regexDigOp = new Regex(@"\d+|[+\-*/]");
@@ -30,10 +30,18 @@ internal class Program
             {
                 int index = substrings.IndexOf(substrings[i]);
                 int product = int.Parse(substrings[index - 1]) * int.Parse(substrings[index+1]);
-                substrings.Insert((index + 2), product.ToString());
-                substrings[index+1] = null;
-                substrings[index] = null;
-                substrings.RemoveRange((index-1), 1);
+                if((index + 2) >= substrings.Count())
+                {
+                    substrings.Add(product.ToString());
+                    substrings.RemoveRange((index-1), 3);
+                }
+                else
+                {
+                    substrings.Insert((index + 2), product.ToString());
+                    substrings[index + 1] = null;
+                    substrings[index] = null;
+                    substrings.RemoveAt(index - 1);
+                }
             }
             else if (substrings[i].Equals("/"))
             {
@@ -54,7 +62,7 @@ internal class Program
                     substrings.Insert((index + 2), quotient.ToString());
                     substrings[index + 1] = null;
                     substrings[index] = null;
-                    substrings.RemoveRange((index - 1), 1);
+                    substrings.RemoveAt(index - 1);
                 }
             }
         }
