@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,14 +9,13 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        string input = "2*9*10/18+5*10/10*2+15/3*2";
+        string input = "10*10+2";
 
         // Digits and Operators
         Regex regexDigOp = new Regex(@"\d+|[+\-*/]");
 
         // List to store values and operators
         List<string> substrings = new List<string>();
-        List<string> substringsOut = new List<string>();
 
         // Get Matches and store in List
         MatchCollection matches = regexDigOp.Matches(input);
@@ -24,7 +25,7 @@ internal class Program
         }
 
         // Multiplicate first all values
-        for (int i = 0; i <= substrings.Count; i++)
+        for (int i = 0; i <= substrings.Count-1; i++)
         {
             if (substrings[i].Equals("*"))
             {
@@ -67,12 +68,55 @@ internal class Program
             }
         }
 
-        foreach(string s in substrings)
+        // clean null vlues
+        substrings.RemoveAll(item => item is null);
+
+        // New List to operat on
+        List<string> substrings2 = new List<string>();
+        substrings2 = substrings;
+
+        for (int i = 0 ; i <= substrings2.Count-1; i++)
         {
-            if (s is not null)
+            if (substrings2[i].Equals("+"))
             {
-                Console.WriteLine(s);
+                int sum = int.Parse(substrings2[i - 1]) + int.Parse(substrings2[i + 1]);
+                if (i +2 >= substrings2.Count())
+                {
+                    substrings2.Add(sum.ToString());
+                    substrings2.RemoveRange((i - 1), 3);
+                }
+                else
+                {
+                    substrings2.Insert((i + 2), sum.ToString());
+                    substrings2[i + 1] = null;
+                    substrings2[i] = null;
+                    substrings2.RemoveAt(i - 1);
+                }
             }
+            else if (substrings2[i].Equals("-"))
+            {
+                int sum = int.Parse(substrings2[i - 1]) - int.Parse(substrings2[i + 1]);
+                if (i + 2 >= substrings2.Count())
+                {
+                    substrings2.Add(sum.ToString());
+                    substrings2.RemoveRange((i - 1), 3);
+                }
+                else
+                {
+                    substrings2.Insert((i + 2), sum.ToString());
+                    substrings2[i + 1] = null;
+                    substrings2[i] = null;
+                    substrings2.RemoveAt(i - 1);
+                }
+            }
+        }
+
+        // clean null vlues
+        substrings2.RemoveAll(item => item is null);
+
+        foreach (string s in substrings2)
+        {
+             Console.WriteLine(s);
         }
     }
 }
