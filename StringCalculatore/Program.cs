@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6,43 +7,50 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        string input = "9*10+5";
+        string input = "9*10+5*10+10/10";
 
         // Digits and Operators
-        Regex regexDigOp = new Regex(@"[\d+\+\*\-/]");
+        Regex regexDigOp = new Regex(@"\d+|[+\-*/]");
 
-        // Function
+        // List to store values and operators
+        List<string> substrings = new List<string>();
+        List<string> substringsOut = new List<string>();
 
-        string CleanString (string s)
+        // Get Matches and store in List
+        MatchCollection matches = regexDigOp.Matches(input);
+        foreach (Match match in matches)
         {
-            if( string.IsNullOrEmpty(s))
-                return s;
-            StringBuilder sb = new StringBuilder();
-            for (Match m = regexDigOp.Match(s); m.Success; m = m.NextMatch())
-            {
-                sb.Append(m.Value);
-            }
-
-            string cleaned = sb.ToString();
-            return cleaned;
+            substrings.Add(match.Value);
         }
 
-        input= CleanString(input);
-
-        // Creating a List to store the numbers
-        List<int> nums = new List<int>();
-
-        string[] substrings = input.Split('+', '*', '-', '/');
-        foreach(string substring in substrings)
+        // Multiplicate first all values
+        for (int i = 0; i <= substrings.Count; i++)
         {
-            int number;
-            if(int.TryParse(substring, out number))
+            if (substrings[i].Equals("*"))
             {
-                nums.Add(number);
+                int index = substrings.IndexOf(substrings[i]);
+                int product = int.Parse(substrings[index - 1]) * int.Parse(substrings[index+1]);
+                substrings.Insert((index + 2), product.ToString());
+                substrings.RemoveRange((index-1), 3);
+            }
+            else if (substrings[i].Equals("/"))
+            {
+                int index = substrings.IndexOf(substrings[i]);
+                if (int.Parse(substrings[index - 1]) == 0 || int.Parse(substrings[index + 1]) == 0)
+                {
+                    Console.WriteLine("We can not devide by 0");
+                    return;
+                }
+                int quotient = int.Parse(substrings[index - 1]) / int.Parse(substrings[index + 1]);
+                substrings.Insert((index +2), quotient.ToString());
+                substrings.RemoveRange((index - 1), 3);
             }
         }
 
-        Console.WriteLine(input);
 
+        foreach(string s in substrings)
+        {
+            Console.WriteLine(s);
+        }
     }
 }
