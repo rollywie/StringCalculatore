@@ -1,33 +1,48 @@
-﻿internal class Program
+﻿using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
+
+internal class Program
 {
     private static void Main(string[] args)
     {
-        string input = "9 + 10 + 1";
+        string input = "9*10+5";
 
-        // Creating List to store the clean numbers
-        List<int> numbers= new List<int>();
+        // Digits and Operators
+        Regex regexDigOp = new Regex(@"[\d+\+\*\-/]");
 
-        // I need to split the string into different parts, where the operators are.
-        // However I need to take the operator into account.
+        // Function
 
-        string[] values = input.Split('+');
-
-        // check length of array and iterate as often through the array
-        foreach (string value in values)
+        string CleanString (string s)
         {
-            int number = int.Parse(value.Trim());
-            numbers.Add(number);
+            if( string.IsNullOrEmpty(s))
+                return s;
+            StringBuilder sb = new StringBuilder();
+            for (Match m = regexDigOp.Match(s); m.Success; m = m.NextMatch())
+            {
+                sb.Append(m.Value);
+            }
+
+            string cleaned = sb.ToString();
+            return cleaned;
         }
 
-        // Adding all values together
-        int sum = 0;
-        foreach (int number in numbers)
+        input= CleanString(input);
+
+        // Creating a List to store the numbers
+        List<int> nums = new List<int>();
+
+        string[] substrings = input.Split('+', '*', '-', '/');
+        foreach(string substring in substrings)
         {
-            sum += number;
+            int number;
+            if(int.TryParse(substring, out number))
+            {
+                nums.Add(number);
+            }
         }
 
-        // Printing the result
-        Console.WriteLine(sum);
+        Console.WriteLine(input);
 
     }
 }
