@@ -7,28 +7,32 @@ using System.Text.RegularExpressions;
 
 internal class Program
 { 
-    // Function Section
+    // Function
+
     public static List<string> RemoveNull (List<string> input)
     {
+        // Remove all items from List which equal null
         input.RemoveAll(item => item is null);
         return input;
+    }
+
+    public static List<string> RegTransform (string input, List<string> substrings)
+    {
+        Regex digitsAndOperators = new Regex(@"\d+|[+\-*/]");
+        MatchCollection matches = digitsAndOperators.Matches(input);
+        foreach (Match match in matches)
+        {
+            substrings.Add(match.Value);
+        }
+        return substrings;
     }
     private static void Main(string[] args)
     {
         string input = "10*10+2";
 
-        // Digits and Operators
-        Regex regexDigOp = new Regex(@"\d+|[+\-*/]");
-
         // List to store values and operators
         List<string> substrings = new List<string>();
-
-        // Get Matches and store in List
-        MatchCollection matches = regexDigOp.Matches(input);
-        foreach (Match match in matches)
-        {
-            substrings.Add(match.Value);
-        }
+        substrings = RegTransform(input, substrings);
 
         // Multiplicate first all values
         for (int i = 0; i <= substrings.Count-1; i++)
