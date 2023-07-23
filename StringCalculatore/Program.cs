@@ -6,7 +6,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 internal class Program
-{
+{ 
+    // Function Section
+    public static List<string> RemoveNull (List<string> input)
+    {
+        input.RemoveAll(item => item is null);
+        return input;
+    }
     private static void Main(string[] args)
     {
         string input = "10*10+2";
@@ -69,7 +75,7 @@ internal class Program
         }
 
         // clean null vlues
-        substrings.RemoveAll(item => item is null);
+        substrings = RemoveNull(substrings);
 
         // New List to operat on
         List<string> substrings2 = new List<string>();
@@ -112,7 +118,7 @@ internal class Program
         }
 
         // clean null vlues
-        substrings2.RemoveAll(item => item is null);
+        substrings2 = RemoveNull(substrings2);
 
         foreach (string s in substrings2)
         {
