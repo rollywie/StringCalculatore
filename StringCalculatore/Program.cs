@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -7,21 +9,77 @@ using System.Text.RegularExpressions;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    // Constant Regex Expression
+    private static readonly Regex regex = new Regex(@"\d+|[+\-*/]");
+    private static readonly Regex regexInt = new Regex(@"\d+");
+    private static readonly Regex regexOp = new Regex(@"[+\-*/]");
+
+    // Function
+
+    // Check that first item in List is no operator
+    public static bool IsFirstOrLastOperator (List<string> inputList)
     {
-        string input = "10*10+2";
+        if (regexInt.IsMatch(inputList[0])
+            && regex.IsMatch(inputList.Last()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-        // Digits and Operators
-        Regex regexDigOp = new Regex(@"\d+|[+\-*/]");
+    public static bool IsValidInput (string input)
+    {
 
-        // List to store values and operators
-        List<string> substrings = new List<string>();
+        if (!string.IsNullOrEmpty(input)
+            && regexInt.IsMatch(input)
+            && regexOp.IsMatch(input))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-        // Get Matches and store in List
-        MatchCollection matches = regexDigOp.Matches(input);
+    public static List<string> RemoveNull (List<string> input)
+    {
+        // Remove all items from List which equal null
+        input.RemoveAll(item => item is null);
+        return input;
+    }
+
+    public static List<string> RegTransform (string input, List<string> substrings)
+    {
+        MatchCollection matches = regex.Matches(input);
         foreach (Match match in matches)
         {
             substrings.Add(match.Value);
+        }
+        return substrings;
+    }
+    private static void Main(string[] args)
+    {
+        // Input string to do calculation on
+        string calculationInput = "++10";
+
+        if (!IsValidInput(calculationInput))
+        {
+            Console.WriteLine("Input is not valid!");
+            return;
+        }
+
+        // List to store values and operators
+        List<string> substrings = new List<string>();
+        substrings = RegTransform(calculationInput, substrings);
+
+        if (!IsFirstOrLastOperator(substrings))
+        {
+            Console.WriteLine("Input can not start of finish with an operator!");
+            return;
         }
 
         // Multiplicate first all values
@@ -49,7 +107,7 @@ internal class Program
                 int index = substrings.IndexOf(substrings[i]);
                 if (int.Parse(substrings[index - 1]) == 0 || int.Parse(substrings[index + 1]) == 0)
                 {
-                    Console.WriteLine("We can not devide by 0");
+                    Console.WriteLine("We can not devide by 0!");
                     return;
                 }
                 int quotient = int.Parse(substrings[index - 1]) / int.Parse(substrings[index + 1]);
@@ -69,7 +127,7 @@ internal class Program
         }
 
         // clean null vlues
-        substrings.RemoveAll(item => item is null);
+        substrings = RemoveNull(substrings);
 
         // New List to operat on
         List<string> substrings2 = new List<string>();
@@ -112,7 +170,7 @@ internal class Program
         }
 
         // clean null vlues
-        substrings2.RemoveAll(item => item is null);
+        substrings2 = RemoveNull(substrings2);
 
         foreach (string s in substrings2)
         {
